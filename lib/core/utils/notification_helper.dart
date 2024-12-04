@@ -29,6 +29,11 @@ class NotificationHelper {
     required String body,
     required DateTime scheduledTime,
   }) async {
+    if (scheduledTime.isBefore(DateTime.now())) {
+      print('Scheduled time must be in the future');
+      return;
+    }
+
     if (await Permission.scheduleExactAlarm.request().isGranted) {
       await _notificationsPlugin.zonedSchedule(
         id,
@@ -45,9 +50,9 @@ class NotificationHelper {
           ),
           iOS: DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.exact,
       );
     } else {
       // Handle the case when the permission is not granted
